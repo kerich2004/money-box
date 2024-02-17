@@ -1,10 +1,13 @@
 const links = document.querySelectorAll('li')
 const sections = document.querySelectorAll('section')
 const form = document.querySelector('form')
+const amountInput = document.querySelector('[name="amount"]')
 const labelElement = document.querySelector('label[name="current"]')
+const currentInput = document.querySelector('[name="current"]')
 const errorMessage = document.querySelector('.error')
-const deleteBtn = document.querySelector('#delete-btn')
-const clearBtn = document.querySelector('#clearBtn')
+const addBtn = document.querySelector('#add-btn')
+const clearBtn = document.querySelector('#clear-btn')
+const table = document.querySelector('table')
 const tbody = document.querySelector('tbody')
 const ls = localStorage
 let transactions = JSON.parse(ls.getItem('transact')) || []
@@ -15,11 +18,11 @@ const amountMoney = {
   uah: 0,
 }
 
-for (link of links) {
+for (const link of links) {
   link.onclick = viewDisplay
 }
 
-deleteBtn.onclick = addTransaction
+addBtn.onclick = addTransaction
 clearBtn.onclick = clearLs
 tbody.onclick = deleteTransaction
 
@@ -30,34 +33,44 @@ function addTransaction(event) {
   event.preventDefault()
   let isValid = true;
 
-  if (!form.amount.value) {
+  if (isNaN(form.amount.value) || form.amount.value <1) {
+    form.amount.value = 'Only numbers'
     isValid = false;
+    addInvalidClass(form.amount)
+  }
 
-    form.amount.classList.add('invalid')
-    // form.amount.parentElement.style = "color: red"
-
-    setTimeout(() => {
-      form.amount.classList.remove('invalid')
-      // form.amount.parentElement.style = "color: red"
-    }, 1000)
+  if (!form.amount.value) {
+    amountInput.value = 'Input is empty'
+    isValid = false;
+    addInvalidClass(form.amount)
   }
 
   if (!form.currency.value) {
     isValid = false;
-    labelElement.style = "color: red"
+    currentInput.style = "color: red"
 
     setTimeout(() => {
-      labelElement.style = "color: black"
+      currentInput.style = "color: black"
     }, 1000)
   }
 
-  else if (isValid) {
-    let newTransaction = {
-      amount: form.amount.value,
-      currency: form.currency.value,
-    }
+  if (!form.date.value) {
+    isValid = false;
+    addInvalidClass(form.date)
+  }
 
-    transactions.push(newTransaction)
+  else if (isValid) {
+    const { amount: { value: amount }, currency: { value: currency }, date: { value: date } } = form
+
+    transactions.push({ amount: +amount, currency, date })
+
+    // let newTransaction = {
+    //   amount: form.amount.value,
+    //   currency: form.currency.value,
+    //   date: form.date.value,
+    // }
+    // transactions.push(newTransaction)
+
     form.reset()
 
     addLocalStorage()
@@ -66,13 +79,15 @@ function addTransaction(event) {
 
 function renderTransTable() {
   tbody.innerHTML = ''
-  for (item of transactions) {
+
+  for (const { amount, currency, date } of transactions) {
     tbody.innerHTML += `
-    <tr>
-    <td>${item.amount}</td>
-    <td>${item.currency}</td>
-    <td><button class="remove-btn">x</button>
-    </tr>
+      <tr>
+        <td>${formatCurrency(amount)}</td>
+        <td>${currency}</td>
+        <td>${date}</td>
+        <td><button class="remove-btn">x</button>
+      </tr>
     `
   }
 }
@@ -82,66 +97,76 @@ function addLocalStorage() {
 
   ls.setItem('transact', transToString)
   renderTransTable()
+  renderCapital()
 }
 
 function viewDisplay(event) {
-  let attribute = event.target.getAttribute('data-section')
+  let id = event.target.getAttribute('data-section')
 
-  for (section of sections) {
+  for (const section of sections) {
+    section.hidden = section.id != id
 
-    if (section.id == attribute) {
+    // section.hidden = section.id == id ? false : true
 
-      section.hidden = false
-    }
-
-    else {
-      section.hidden = true
-    }
-
+    // if (section.id == id) {
+    //   section.hidden = false
+    // }
+    // else {
+    //   section.hidden = true
+    // }
   }
 }
 
 function clearLs() {
-  ls.clear()
+  ls.removeItem('transact')
+  transactions = []
 
   tbody.innerHTML = ''
+
+  renderCapital()
+  renderTransTable()
 }
 
-function deleteTransaction(event) {
-  if (event.target.classList.contains('remove-btn')) {
-    const row = event.target.closest('tr')
-    const rowIndex = row.rowIndex -1 
-    
+function deleteTransaction({ target }) {
+  if (target.classList.contains('remove-btn')) {
+    const row = target.closest('tr')
+    const rowIndex = row.rowIndex - 1
+
     transactions.splice(rowIndex, 1)
     renderTransTable()
     ls.setItem('transact', JSON.stringify(transactions))
+    renderCapital()
   }
 }
 
 function renderCapital() {
-  let [, dollarSpan, euroSpan, uahSpan, ] = document.querySelectorAll('span')
+  let [, dollarSpan, euroSpan, uahSpan] = document.querySelectorAll('span')
   let dollCount = 0;
   let euroCount = 0;
   let uahCount = 0
 
-  for (let transaction of transactions) {
-  if (transaction.currency == '$') dollCount += (+transaction.amount)
-  if (transaction.currency == '€') euroCount += (+transaction.amount)
-  if (transaction.currency == '₴') uahCount += (+transaction.amount)
+  for (let { currency, amount } of transactions) {
+    if (currency == '$') dollCount += amount
+    if (currency == '€') euroCount += amount
+    if (currency == '₴') uahCount += amount
+  }
+
+  dollarSpan.innerText = formatCurrency(dollCount)
+  euroSpan.innerText = formatCurrency(euroCount)
+  uahSpan.innerText = formatCurrency(uahCount)
+
 }
 
-dollarSpan.innerHTML = dollCount
-euroSpan.innerText = euroCount
-uahSpan.innerHTML = uahCount
+function addInvalidClass(input) {
+
+  input.classList.add('invalid')
+
+  setTimeout(() => {
+    amountInput.value = ''
+    input.classList.remove('invalid')
+  }, 1000)
 }
 
-
-// for (let transaction of transactions) {
-//   if (transaction.currency == '$') dollCount += transaction.currency
-//   if (transaction.currency == '€') euroCount += transaction.currency
-//   if (transaction.currency == '₴') uahCount += transaction.currency
-// }
-
-// dollarSpan.innerHTML = dollCount
-// euroSpan.innerHTML = euroCount
-// uahSpan.innerHTML = uahCount
+function formatCurrency(currency) {
+  return currency.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+}

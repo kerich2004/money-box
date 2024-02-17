@@ -8,74 +8,88 @@
   <script src="script.js" defer></script>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="images/favicon.ico">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
+  <h1>My money box</h1>
+
   <section id="home-section">
-    <h1>My money box</h1>
-    <nav>
-      <ul>
-        <li><a href="#" data-section="home-section">Home</a></li>
-        <li><a href="#" data-section="section-transactions">Transactions</a></li>
-        <li><a href="#" data-section="section-capital">Capital</a></li>
-      </ul>
-    </nav>
-    <form action="">
-      <label>
-        <input type="text" name="amount">
-        <br>
-        Enter amount
-        <span class="error">Error</span>
-      </label>
-      <label name="current">
-        <input type="radio" name="currency" value="$">$
-        <input type="radio" name="currency" value="€">€
-        <input type="radio" name="currency" value="₴">₴
-        <br>
-        Enter currency
-      </label>
-      <button id="delete-btn">Add transaction</button>
-    </form>
-    <img src="/images/logo.png" alt="logo">
+    <header>
+      <nav>
+        <ul>
+          <li data-section="home-section">Home</li>
+          <li data-section="section-transactions">Transactions</li>
+          <li data-section="section-capital">Capital</li>
+        </ul>
+      </nav>
+    </header>
+
+      <form action="">
+        <label>
+          Enter amount
+          <br>
+          <input type="text" name="amount">
+          <span class="error">Error</span>
+        </label>
+        <div name="current">
+          Enter currency <br>
+          <label><input type="radio" name="currency" value="$">$</label>
+          <label><input type="radio" name="currency" value="€">€</label>
+          <label><input type="radio" name="currency" value="₴">₴</label>
+        </div>
+        <label for="" name="date">
+          <input type="date" name="date">
+        </label>
+        <button id="add-btn">Add transaction</button>
+      </form>
   </section>
 
   <section id="section-transactions" hidden>
-    <h1>Transactions</h1>
-    <nav>
-      <ul>
-        <li><a href="#" data-section="home-section">Home</a></li>
-        <li><a href="#" data-section="section-transactions">Transactions</a></li>
-        <li><a href="#" data-section="section-capital">Capital</a></li>
-      </ul>
-    </nav>
+    <header>
+      <nav>
+        <ul>
+          <li data-section="home-section">Home</li>
+          <li data-section="section-transactions">Transactions</li>
+          <li data-section="section-capital">Capital</li>
+        </ul>
+      </nav>
+    </header>
 
     <table>
       <thead>
         <th>Data trans</th>
-        <th>Current</th>
+        <th>Currency</th>
+        <th>Date</th>
         <th></th>
       </thead>
       <tbody>
       </tbody>
     </table>
-    <button id="clearBtn">Clear table</button>
+    <button id="clear-btn">Clear table</button>
   </section>
 
   <section id="section-capital" hidden>
-    <h1>Capital</h1>
-
-    <nav>
-      <ul>
-        <li><a href="#" data-section="home-section">Home</a></li>
-        <li><a href="#" data-section="section-transactions">Transactions</a></li>
-        <li><a href="#" data-section="section-capital">Capital</a></li>
-      </ul>
-    </nav>
+    <header>
+      <nav>
+        <ul>
+          <li data-section="home-section">Home</li>
+          <li data-section="section-transactions">Transactions</li>
+          <li data-section="section-capital">Capital</li>
+        </ul>
+      </nav>
+    </header>
 
     <div class="section-capital-out">
-      <p>US Dollar:<span>0</span>$</p>
-      <p>Euro:<span>0</span>€</p>
-      <p>UAH:<span>0</span>₴</p>
+      <p>US Dollar:$</p>
+      <span></span>
+      <p>Euro: €</p>
+      <span>0</span>
+      <p>UAH:₴</p>
+      <span>0</span>
     </div>
   </section>
 </body>
